@@ -53,7 +53,8 @@ def main(options: Namespace, inputdir: Path, outputdir: Path):
     :param inputdir: directory containing (read-only) input files
     :param outputdir: directory where to write output files
     """
-
+    start_date = options.startdate
+    end_date = options.enddate
     print(DISPLAY_TITLE)
 
     # Typically it's easier to think of programs as operating on individual files
