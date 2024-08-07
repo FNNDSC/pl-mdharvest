@@ -73,6 +73,40 @@ def main(options: Namespace, inputdir: Path, outputdir: Path):
         frequency = data.count(options.word)
         output_file.write_text(str(frequency))
 
+#Vaikunthan changes below
+import os
+from datetime import datetime, timedelta
+
+def FileMapper(start_date, end_date):
+    #Create Datetime objects
+    start = datetime.strptime(start_date, '%Y%m%d')
+    end = datetime.strptime(end_date, '%Y%m%d')
+    
+    #Datetime library should calculate the total difference in days
+    total_days = (end - start).days + 1
+
+    current_date = start
+    for i in range(1, total_days + 1):
+        year = current_date.strftime('%Y')
+        month = current_date.strftime('%m')
+        day = current_date.strftime('%d')
+
+        directory_path = os.path.join(year, month, day)
+        os.makedirs(directory_path, exist_ok = True)
+
+        file_path = os.path.join(directory_path, f'{current_date.strftime('%Y%m%d')}.txt')
+        with open(file_path, 'w') as file:
+            file.write(f"Data for {current_date.strftime('%Y-%m-%d')}")
+
+        current_date += timedelta(days = 1)
+
+#Example Call
+#start_date = '20240101'
+#end_date = '20240110'
+#FileMapper(start_date, end_date)
+#Should produce directory for 10 days
+    
+
 
 if __name__ == '__main__':
-    main()
+   main()
