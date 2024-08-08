@@ -5,6 +5,9 @@ from argparse import ArgumentParser, Namespace, ArgumentDefaultsHelpFormatter
 
 from chris_plugin import chris_plugin, PathMapper
 
+import os, sys
+from datetime import datetime, timedelta
+
 __version__ = '1.0.0'
 
 DISPLAY_TITLE = r"""
@@ -18,15 +21,14 @@ DISPLAY_TITLE = r"""
 |_|                                                                 
 """
 
-
+#Can we just use an NLP library or literally just a counter
+#Would need to store case-senstive words plus typos?
 parser = ArgumentParser(description='!!!CHANGE ME!!! An example ChRIS plugin which '
                                     'counts the number of occurrences of a given '
                                     'word in text files.',
                         formatter_class=ArgumentDefaultsHelpFormatter)
-parser.add_argument('-w', '--word', required=True, type=str,
-                    help='word to count')
-parser.add_argument('-p', '--pattern', default='**/*.txt', type=str,
-                    help='input file filter glob')
+parser.add_argument('-s', '--startdate', required=True, type=str, help="the start date")
+parser.add_argument('-e', '--enddate', required=True, type=str, help="the end date")
 parser.add_argument('-V', '--version', action='version',
                     version=f'%(prog)s {__version__}')
 
@@ -41,7 +43,7 @@ parser.add_argument('-V', '--version', action='version',
     category='',                 # ref. https://chrisstore.co/plugins
     min_memory_limit='100Mi',    # supported units: Mi, Gi
     min_cpu_limit='1000m',       # millicores, e.g. "1000m" = 1 CPU core
-    min_gpu_limit=0              # set min_gpu_limit=1 to enable GPU
+    min_gpu_limit=0              # set min_ gpu_limit=1 to enable GPU
 )
 def main(options: Namespace, inputdir: Path, outputdir: Path):
     """
@@ -56,23 +58,35 @@ def main(options: Namespace, inputdir: Path, outputdir: Path):
     start_date = options.startdate
     end_date = options.enddate
     print(DISPLAY_TITLE)
+    dateTreeBuild(start_date, end_date, outputdir)
 
-    # Typically it's easier to think of programs as operating on individual files
-    # rather than directories. The helper functions provided by a ``PathMapper``
-    # object make it easy to discover input files and write to output files inside
-    # the given paths.
-    #
-    # Refer to the documentation for more options, examples, and advanced uses e.g.
-    # adding a progress bar and parallelism.
-    mapper = PathMapper.file_mapper(inputdir, outputdir, glob=options.pattern, suffix='.count.txt')
-    for input_file, output_file in mapper:
-        # The code block below is a small and easy example of how to use a ``PathMapper``.
-        # It is recommended that you put your functionality in a helper function, so that
-        # it is more legible and can be unit tested.
-        data = input_file.read_text()
-        frequency = data.count(options.word)
-        output_file.write_text(str(frequency))
+def dateTreeBuild(start_date, end_date, outputdir):
+    #Create Datetime objects
+    try:
+        start = datetime.strptime(start_date, '%Y%m%d')
+        end = datetime.strptime(end_date, '%Y%m%d')
+    except Exception as e:
+        print("Hmmm... it seems either the start or end dates are invalid. Please check and try again.")
+        sys.exit(1)
+    
+    #Datetime library should calculate the total difference in days
+    total_days:int = (end - start).days + 1
+
+    if(total_days <= 0):
+        print("The end date seems to be _before_ the start date. No output created.")
+
+    current_date = start
+    for i in range(1, total_days + 1):
+        year = current_date.strftime('%Y')
+        month = current_date.strftime('%m')
+        day = current_date.strftime('%d')
+
+        directory_path = os.path.join(str(outputdir), year, month, day)
+        print(f"Making path: {directory_path}") 
+        os.makedirs(directory_path, exist_ok = True)
+        
+        current_date += timedelta(days = 1)
 
 
 if __name__ == '__main__':
-    main()
+   main()
