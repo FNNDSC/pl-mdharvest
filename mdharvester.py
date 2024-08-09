@@ -60,6 +60,7 @@ def main(options: Namespace, inputdir: Path, outputdir: Path):
     print(DISPLAY_TITLE)
     test_dateTreeBuild()
 
+
 def dateTreeBuild(start_date, end_date, outputdir):
     #Create Datetime objects
 
@@ -87,9 +88,14 @@ def dateTreeBuild(start_date, end_date, outputdir):
 
         directory_path = os.path.join(str(outputdir), year, month, day)
         print(f"Making path: {directory_path}") 
-        os.makedirs(directory_path, exist_ok = True)
-        
-        current_date += timedelta(days = 1)
+        os.makedirs(directory_path, exist_ok=True)
+
+        file_name = f"{year}-{month}-{day}.txt"
+        file_path = os.path.join(directory_path, file_name)
+        with open(file_path, 'w') as file:
+            file.write(f"File created at: {directory_path}\n")
+
+        current_date += timedelta(days=1)
 def test_dateTreeBuild():
 
     print("Test1: Valid Date Range")
@@ -103,8 +109,6 @@ def test_dateTreeBuild():
         dateTreeBuild('2022-01-01', '20220105', 'test_dir3')
     except SystemExit as e:
         print("Caught an expected  SystemExit due to invalid date format")
-
-
 
     print("\nTest 4: Same Start and End Date")
     dateTreeBuild('20220101', '20220101', 'test_dir4')
