@@ -58,10 +58,14 @@ def main(options: Namespace, inputdir: Path, outputdir: Path):
     start_date = options.startdate
     end_date = options.enddate
     print(DISPLAY_TITLE)
-    dateTreeBuild(start_date, end_date, outputdir)
+    test_dateTreeBuild()
 
 def dateTreeBuild(start_date, end_date, outputdir):
     #Create Datetime objects
+
+    start_date = ''.join(filter(str.isdigit, start_date))
+    end_date = ''.join(filter(str.isdigit, end_date))
+
     try:
         start = datetime.strptime(start_date, '%Y%m%d')
         end = datetime.strptime(end_date, '%Y%m%d')
@@ -86,7 +90,25 @@ def dateTreeBuild(start_date, end_date, outputdir):
         os.makedirs(directory_path, exist_ok = True)
         
         current_date += timedelta(days = 1)
+def test_dateTreeBuild():
 
+    print("Test1: Valid Date Range")
+    dateTreeBuild('20230101', '20230105', 'test_dir1')
+
+    print("\nTest 2: End Date Before Start Date")
+    dateTreeBuild('20220105', '20220101', 'test_dir2')
+
+    print("\nTest 3:Invalid Date Format")
+    try:
+        dateTreeBuild('2022-01-01', '20220105', 'test_dir3')
+    except SystemExit as e:
+        print("Caught an expected  SystemExit due to invalid date format")
+
+
+
+    print("\nTest 4: Same Start and End Date")
+    dateTreeBuild('20220101', '20220101', 'test_dir4')
+    
 
 if __name__ == '__main__':
    main()
