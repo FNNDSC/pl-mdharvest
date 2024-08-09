@@ -65,6 +65,7 @@ def dateTreeBuild(start_date, end_date, outputdir):
 
     start_date = ''.join(filter(str.isdigit, start_date))
     end_date = ''.join(filter(str.isdigit, end_date))
+
     try:
         start = datetime.strptime(start_date, '%Y%m%d')
         end = datetime.strptime(end_date, '%Y%m%d')
@@ -104,9 +105,10 @@ def test_dateTreeBuild():
         print("Caught an expected  SystemExit due to invalid date format")
 
 
+
     print("\nTest 4: Same Start and End Date")
     dateTreeBuild('20220101', '20220101', 'test_dir4')
     
 
 if __name__ == '__main__':
-    main()
+   main()
